@@ -31,7 +31,6 @@
       position: relative;
       border: 8px solid #333;
       transition: transform 4s ease-out;
-      /* Make sure the wheel does not block any clicks */
       pointer-events: none;
     }
     /* Create the colored segments with a conic-gradient */
@@ -50,10 +49,8 @@
       pointer-events: none;
     }
     /* Position the text for each segment.
-       We position each .segment at the center (50%,50%) then rotate it
-       to its correct angle, move it outward (translateY) and then counter-rotate
-       so the text stays horizontal.
-       Adjust the translateY distance (here 110px) to suit your design. */
+       Each segment is positioned at the center of the wheel and then moved outward.
+       The center of each wedge in the conic-gradient is at: 36°, 108°, 180°, 252°, 324° */
     .segment {
       position: absolute;
       top: 50%;
@@ -64,8 +61,7 @@
       color: white;
       pointer-events: none;
     }
-    /* Center angles for each segment: 
-       1st: 36deg, 2nd: 108deg, 3rd: 180deg, 4th: 252deg, 5th: 324deg */
+    /* Adjust each segment's rotation so that its text is centered along its wedge. */
     .segment1 {
       --angle: 36deg;
       transform: rotate(var(--angle)) translateY(-110px) rotate(calc(-1 * var(--angle)));
@@ -150,13 +146,17 @@
       spinButton.disabled = true;
       resultDiv.innerText = "";
 
+      // Choose a random index from 0 to 4
       const randomStop = Math.floor(Math.random() * prizes.length);
-      const anglePerPrize = 360 / prizes.length;
-      // Calculate the angle to stop at. Using 360 - (randomStop * anglePerPrize)
-      // so that the prize appears at the top (where the pointer is)
-      const stopAngle = 360 - randomStop * anglePerPrize;
-      const rotations = 5 * 360 + stopAngle;
-      currentRotation += rotations;
+      const anglePerPrize = 360 / prizes.length; // 72 degrees per segment
+      // The center angle for each wedge is: 36°, 108°, 180°, 252°, 324°
+      const centerAngle = 36 + randomStop * anglePerPrize;
+      // To align the chosen segment's center with the pointer at top (0°),
+      // the wheel must be rotated by (360 - centerAngle) mod 360.
+      const desiredRotation = 360 - centerAngle;
+      const extraRotations = 5 * 360; // extra full rotations for effect
+      const totalRotation = extraRotations + desiredRotation;
+      currentRotation += totalRotation;
 
       wheel.style.transform = `rotate(${currentRotation}deg)`;
 
