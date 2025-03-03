@@ -147,23 +147,26 @@
       // Choose a random index from 0 to 4
       const randomStop = Math.floor(Math.random() * prizes.length);
       const anglePerPrize = 360 / prizes.length; // 72 degrees per segment
-      // The center angle for each wedge is: 36°, 108°, 180°, 252°, 324°
+      // Center angle for each wedge: 36°, 108°, 180°, 252°, 324°
       const centerAngle = 36 + randomStop * anglePerPrize;
       // To align the chosen segment's center with the pointer at top (0°),
-      // the wheel must be rotated by (360 - centerAngle)
+      // we need the final rotation (mod 360) to equal (360 - centerAngle)
       const desiredRotation = 360 - centerAngle;
+
+      // Calculate adjustment based on current rotation (mod 360)
+      const currentRotationMod = currentRotation % 360;
+      const adjustment = (desiredRotation - currentRotationMod + 360) % 360;
       const extraRotations = 5 * 360; // extra full rotations for effect
-      const totalRotation = extraRotations + desiredRotation;
+      const totalRotation = extraRotations + adjustment;
       currentRotation += totalRotation;
 
       wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-      // Listen for the transition end event
+      // Listen for the transition end event for accurate timing
       const onTransitionEnd = () => {
         spinning = false;
         spinButton.disabled = false;
         resultDiv.innerText = `Apoorva, you won ${prizes[randomStop]}! 🎉`;
-        // Remove the listener so it only runs once per spin
         wheel.removeEventListener("transitionend", onTransitionEnd);
       };
 
