@@ -48,9 +48,7 @@
       );
       pointer-events: none;
     }
-    /* Position the text for each segment.
-       Each segment is positioned at the center of the wheel and then moved outward.
-       The center of each wedge in the conic-gradient is at: 36°, 108°, 180°, 252°, 324° */
+    /* Position the text for each segment */
     .segment {
       position: absolute;
       top: 50%;
@@ -152,7 +150,7 @@
       // The center angle for each wedge is: 36°, 108°, 180°, 252°, 324°
       const centerAngle = 36 + randomStop * anglePerPrize;
       // To align the chosen segment's center with the pointer at top (0°),
-      // the wheel must be rotated by (360 - centerAngle) mod 360.
+      // the wheel must be rotated by (360 - centerAngle)
       const desiredRotation = 360 - centerAngle;
       const extraRotations = 5 * 360; // extra full rotations for effect
       const totalRotation = extraRotations + desiredRotation;
@@ -160,11 +158,16 @@
 
       wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-      setTimeout(() => {
+      // Listen for the transition end event
+      const onTransitionEnd = () => {
         spinning = false;
         spinButton.disabled = false;
         resultDiv.innerText = `Apoorva, you won ${prizes[randomStop]}! 🎉`;
-      }, 4000);
+        // Remove the listener so it only runs once per spin
+        wheel.removeEventListener("transitionend", onTransitionEnd);
+      };
+
+      wheel.addEventListener("transitionend", onTransitionEnd);
     };
 
     spinButton.addEventListener("click", spinWheel);
